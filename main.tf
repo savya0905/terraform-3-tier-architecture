@@ -1,3 +1,4 @@
+
 terraform {
   required_providers {
     aws = {
@@ -7,17 +8,9 @@ terraform {
   }
 }
 
-terraform {
-  backend "s3" {
-    bucket = "terrastatebyucket00789707789"
-    key    = "savya"
-    region = "us-east-1"
-  }
-}
-
 # Configure the AWS Provider
 provider "aws" {
-  region = "us-east-1"
+  region = "ap-southeast-1a"
 }
 
 # Create a VPC
@@ -28,77 +21,83 @@ resource "aws_vpc" "my-vpc" {
   }
 }
 
-# Create Public Subnet for web-server-1
+# Create Web Public Subnet
 resource "aws_subnet" "web-subnet-1" {
   vpc_id                  = aws_vpc.my-vpc.id
   cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-1a"
+  availability_zone       = "ap-southeast-1a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "swiggy-Web-subnet-1a"
+    Name = "Web-1a"
   }
 }
 
-# Create Public Subnet for web-server-2
 resource "aws_subnet" "web-subnet-2" {
   vpc_id                  = aws_vpc.my-vpc.id
   cidr_block              = "10.0.2.0/24"
-  availability_zone       = "us-east-1b"
+  availability_zone       = "ap-southeast-1a"
   map_public_ip_on_launch = true
-  tags = {
-    Name = "swiggy-Web-subnet-1b"
+ tags = {
+    Name = "Web-2a"
   }
 }
 
 
 
-# Create Private Subnet for app-server-1
+# Create Application Private Subnet
 resource "aws_subnet" "application-subnet-1" {
   vpc_id                  = aws_vpc.my-vpc.id
   cidr_block              = "10.0.11.0/24"
-  availability_zone       = "us-east-1a"
+  availability_zone       = "ap-southeast-1a"
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "swiggy-App-subnet-1a"
+    Name = "Application-1a"
   }
 }
 
-# Create Private Subnet for app-server-2
 resource "aws_subnet" "application-subnet-2" {
   vpc_id                  = aws_vpc.my-vpc.id
   cidr_block              = "10.0.12.0/24"
-  availability_zone       = "us-east-1b"
+  availability_zone       = "ap-southeast-1a"
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "swiggy-App-subnet-1b"
+    Name = "Application-2b"
   }
 }
 
-# Create Private Subnet for db-server-1
+# Create Database Private Subnet
 resource "aws_subnet" "database-subnet-1" {
   vpc_id            = aws_vpc.my-vpc.id
   cidr_block        = "10.0.21.0/24"
-  availability_zone = "us-east-1a"
+  availability_zone = "ap-southeast-1a"
 
   tags = {
-    Name = "swiggy-DB-subnet-1a"
+    Name = "Database-1a"
   }
 }
 
-# Create Private Subnet for db-server-2
 resource "aws_subnet" "database-subnet-2" {
   vpc_id            = aws_vpc.my-vpc.id
   cidr_block        = "10.0.22.0/24"
-  availability_zone = "us-east-1b"
+  availability_zone = "ap-southeast-1a"
 
   tags = {
-    Name = "swiggy-DB-subnet-lb"
+    Name = "Database-2b"
   }
 }
 
+resource "aws_subnet" "database-subnet" {
+  vpc_id            = aws_vpc.my-vpc.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "ap-southeast-1a"
+
+  tags = {
+    Name = "Database"
+  }
+}
 
 # Create Internet Gateway
 resource "aws_internet_gateway" "igw" {
@@ -108,7 +107,6 @@ resource "aws_internet_gateway" "igw" {
     Name = "SWIGGY-IGW"
   }
 }
-
 
 # Create Web layber route table
 resource "aws_route_table" "web-rt" {
@@ -125,7 +123,6 @@ resource "aws_route_table" "web-rt" {
   }
 }
 
-
 # Create Web Subnet association with Web route table
 resource "aws_route_table_association" "a" {
   subnet_id      = aws_subnet.web-subnet-1.id
@@ -137,54 +134,52 @@ resource "aws_route_table_association" "b" {
   route_table_id = aws_route_table.web-rt.id
 }
 
-#Create WEB-SERVER-1 Instance
+#Create EC2 Instance
 resource "aws_instance" "webserver1" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
-  availability_zone      = "us-east-1a"
+  availability_zone      = "ap-southeast-1a"
   key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
   user_data              = "${file("apache.sh")}"
 
   tags = {
-    Name = "SWIGGY-Web-Server-1"
+    Name = "Web Server"
   }
 }
 
-#Create WEB-SERVER-2 Instance
 resource "aws_instance" "webserver2" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
-  availability_zone      = "us-east-1b"
+  availability_zone      = "ap-southeast-1a"
   key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
-  user_data              = "{file("apache.sh")}"
+  user_data              = "${file("apache.sh")}"
 
   tags = {
-    Name = "SWIGGY-Web-Server-2"
+    Name = "Web Server"
   }
 }
 
-#Create APP SERVER-1 EC2 Instance
+#Create EC2 Instance
 resource "aws_instance" "appserver1" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
-  availability_zone      = "us-east-1a"
+  availability_zone      = "ap-southeast-1a"
   key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.appserver-sg.id]
   subnet_id              = aws_subnet.application-subnet-1.id
   tags = {
-    Name = "SWIGGY-app-Server-1"
+    Name = "app Server-1"
   }
 }
 
-#Create APP SERVER-2 EC2 Instance
 resource "aws_instance" "appserver2" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
-  availability_zone      = "us-east-1b"
+  availability_zone      = "ap-southeast-1a"
   key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.appserver-sg.id]
   subnet_id              = aws_subnet.application-subnet-2.id
@@ -196,16 +191,16 @@ resource "aws_instance" "appserver2" {
 
 resource "aws_db_instance" "default" {
   allocated_storage      = 10
-  db_name                = "mydb"
+  db_subnet_group_name   = aws_db_subnet_group.default.id
   engine                 = "mysql"
-  engine_version         = "8.0"
-  instance_class         = "db.t3.micro"
-  username               = "admin"
-  password               = "Raham#444555"
-  parameter_group_name   = "default.mysql8.0"
+  engine_version         = "8.0.28"
+  instance_class         = "db.t2.micro"
+  multi_az               = false
+  db_name                = "mydb"
+  username               = "raham"
+  password               = "Rahamshaik#444555"
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.database-sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.default.id
 }
 
 resource "aws_db_subnet_group" "default" {
@@ -216,6 +211,7 @@ resource "aws_db_subnet_group" "default" {
     Name = "My DB subnet group"
   }
 }
+
 
 # Create Web Security Group
 resource "aws_security_group" "webserver-sg" {
@@ -245,7 +241,7 @@ resource "aws_security_group" "webserver-sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = {
+ tags = {
     Name = "Web-SG"
   }
 }
@@ -257,18 +253,18 @@ resource "aws_security_group" "appserver-sg" {
   vpc_id      = aws_vpc.my-vpc.id
 
   ingress {
-    description = "Allow traffic from web layer"
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
+    description     = "Allow traffic from web layer"
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    description = "Allow traffic from web layer"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+ ingress {
+    description     = "Allow traffic from web layer"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -291,10 +287,10 @@ resource "aws_security_group" "database-sg" {
   vpc_id      = aws_vpc.my-vpc.id
 
   ingress {
-    description = "Allow traffic from application layer"
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
+    description     = "Allow traffic from application layer"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -310,10 +306,8 @@ resource "aws_security_group" "database-sg" {
   }
 }
 
-#CREATE LOAD-BALANCER FOR SWIGGY
-
 resource "aws_lb" "external-elb" {
-  name               = "SWIGGY-LB"
+  name               = "External-LB"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.webserver-sg.id]
@@ -367,37 +361,26 @@ output "lb_dns_name" {
 }
 
 
-resource "aws_s3_bucket" "example" {
-  bucket = "pipleinbucket0088bdhuwtrrrrf3t5hd8e8r"
-}
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "savya005"  
 
-
-resource "aws_s3_bucket_versioning" "versioning_example" {
-  bucket = aws_s3_bucket.example.id
-  versioning_configuration {
-    status = "Enabled"
+  acl    = "private"  
+  versioning {
+    enabled = true 
   }
 }
 
-resource "aws_iam_group_membership" "team" {
-  name = "tf-testing-group-membership"
-
-  users = [
-    aws_iam_user.user_one.name,
-    aws_iam_user.user_two.name,
-  ]
-
-  group = aws_iam_group.group.name
+resource "aws_iam_user" "one" {
+for_each = var.iam_users
+name = each.value
 }
 
-resource "aws_iam_group" "group" {
-  name = "test-group"
+variable "iam_users" {
+description = ""
+type = set(string)
+default = ["user1", "user2", "user3", "user4"]
 }
 
-resource "aws_iam_user" "user_one" {
-  name = "test-user"
-}
-
-resource "aws_iam_user" "user_two" {
-  name = "test-user-two"
+resource "aws_iam_group" "two" {
+name = "devopswithawsbysavya"
 }
