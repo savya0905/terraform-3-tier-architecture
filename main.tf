@@ -9,7 +9,7 @@ terraform {
 }
 terraform {
   backend "s3" {
-    bucket = "terrastatebyucket00789707789"
+    bucket = "savyabucket12345"
     key    = "savya"
     region = "ap-southeast-1"
 }
