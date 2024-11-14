@@ -7,6 +7,13 @@ terraform {
     }
   }
 }
+terraform {
+  backend "s3" {
+    bucket = "terrastatebyucket00789707789"
+    key    = "savya"
+    region = "ap-southeast-1"
+}
+}
 
 # Configure the AWS Provider
 provider "aws" {
