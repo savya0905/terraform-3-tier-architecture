@@ -10,7 +10,7 @@ terraform {
 terraform {
   backend "s3" {
     bucket = "terrastatebyucket00789707789"
-    key    = "nivvi05"
+    key    = "savya"
     region = "us-east-1"
   }
 }
@@ -142,10 +142,10 @@ resource "aws_instance" "webserver1" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1a"
-  key_name               = "dockerr"
+  key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
-  user_data              = file("apache.sh")
+  user_data              = "${file("apache.sh")}"
 
   tags = {
     Name = "SWIGGY-Web-Server-1"
@@ -157,10 +157,10 @@ resource "aws_instance" "webserver2" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1b"
-  key_name               = "dockerr"
+  key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
-  user_data              = file("apache.sh")
+  user_data              = "{file("apache.sh")}"
 
   tags = {
     Name = "SWIGGY-Web-Server-2"
@@ -172,7 +172,7 @@ resource "aws_instance" "appserver1" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1a"
-  key_name               = "dockerr"
+  key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.appserver-sg.id]
   subnet_id              = aws_subnet.application-subnet-1.id
   tags = {
@@ -185,7 +185,7 @@ resource "aws_instance" "appserver2" {
   ami                    = "ami-0d5eff06f840b45e9"
   instance_type          = "t2.micro"
   availability_zone      = "us-east-1b"
-  key_name               = "dockerr"
+  key_name               = "savya"
   vpc_security_group_ids = [aws_security_group.appserver-sg.id]
   subnet_id              = aws_subnet.application-subnet-2.id
 
