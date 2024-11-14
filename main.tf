@@ -2,15 +2,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "5.69.0"
+      version = "5.75.1"
     }
   }
 }
 
 terraform {
   backend "s3" {
-    bucket = "terrastatebyucket0078970778"
-    key    = "terraform.tfstate"
+    bucket = "terrastatebyucket00789707789"
+    key    = "nivvi05"
     region = "us-east-1"
   }
 }
