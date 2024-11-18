@@ -350,14 +350,18 @@ output "lb_dns_name" {
   value       = aws_lb.external-elb.dns_name
 }
 
+resource "aws_s3_bucket" "example" {
+  bucket = "pipleinbucket0088bdhuwtrrrrf3t5hd8e8r"
+}
 
-resource "aws_s3_bucket" "my_bucket" {
-  bucket = "savya005dugyala"  
- acl    = "private"  
-  versioning {
-    enabled = true 
+
+resource "aws_s3_bucket_versioning" "versioning_example" {
+  bucket = aws_s3_bucket.example.id
+  versioning_configuration {
+    status = "Enabled"
   }
 }
+
 
 resource "aws_iam_user" "one" {
 for_each = var.iam_users
