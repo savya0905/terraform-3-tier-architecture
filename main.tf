@@ -7,13 +7,6 @@ terraform {
     }
   }
 }
-terraform {
-  backend "s3" {
-    bucket = "savyabucket1234"
-    key    = "savya"
-    region = "ap-southeast-1"
-}
-}
 
 # Configure the AWS Provider
 provider "aws" {
@@ -93,16 +86,6 @@ resource "aws_subnet" "database-subnet-2" {
 
   tags = {
     Name = "Database-2b"
-  }
-}
-
-resource "aws_subnet" "database-subnet" {
-  vpc_id            = aws_vpc.my-vpc.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "ap-southeast-1a"
-
-  tags = {
-    Name = "Database"
   }
 }
 
@@ -369,9 +352,8 @@ output "lb_dns_name" {
 
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "savya005"  
-
-  acl    = "private"  
+  bucket = "savya005dugyala"  
+ acl    = "private"  
   versioning {
     enabled = true 
   }
